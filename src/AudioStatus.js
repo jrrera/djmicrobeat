@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 const JSON_SOURCE = "https://stream.djmicrobeat.com:8443/status-json.xsl";
@@ -7,14 +7,16 @@ function AudioStatus() {
   const [isStreaming, setStreaming] = useState(false);
   const [streamUrl, setStreamUrl] = useState(null);
 
-  fetch(JSON_SOURCE)
-    .then(res => res.json())
-    .then(json => {
-      if (json.icestats && json.icestats.source) {
-        setStreaming(true);
-        setStreamUrl(json.icestats.source);
-      }
-    });
+  useEffect(() => {
+    fetch(JSON_SOURCE)
+      .then(res => res.json())
+      .then(json => {
+        if (json.icestats && json.icestats.source) {
+          setStreaming(true);
+          setStreamUrl(json.icestats.source);
+        }
+      });
+  }, []);
 
   return (
     <>
