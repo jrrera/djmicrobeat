@@ -13,7 +13,7 @@ function AudioStatus() {
       .then(json => {
         if (json.icestats && json.icestats.source) {
           setStreaming(true);
-          setStreamUrl(json.icestats.source);
+          setStreamUrl(json.icestats.source.listenurl);
         }
       });
   }, []);
