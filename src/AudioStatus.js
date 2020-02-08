@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from "react";
+import fetchStreamMetadata from "./utils/fetchStreamMetadata";
+import ListenerCount from "./ListenerCount";
 import "./App.css";
 
-const JSON_SOURCE = "https://stream.djmicrobeat.com:8443/status-json.xsl";
-
 function AudioStatus() {
+  const [isLoading, setLoading] = useState(true);
   const [isStreaming, setStreaming] = useState(false);
   const [streamUrl, setStreamUrl] = useState(null);
+  const [initialListeners, setInitialListeners] = useState(null);
 
   useEffect(() => {
-    fetch(JSON_SOURCE)
-      .then(res => res.json())
-      .then(json => {
-        if (json.icestats && json.icestats.source) {
-          setStreaming(true);
-          setStreamUrl(json.icestats.source.listenurl);
-        }
-      });
+    fetchStreamMetadata().then(json => {
+      if (json.icestats && json.icestats.source) {
+        setStreaming(true);
+        setStreamUrl(json.icestats.source.listenurl);
+        setInitialListeners(json.icestats.source.listeners);
+      }
+      setLoading(false);
+    });
   }, []);
 
   return (
     <>
       <div className="AudioStatus-status">
-        Live Stream Status: {isStreaming ? "Online" : "Offline"}
+        <span>Live Stream Status: </span>
+        {isLoading && <span>..........</span>}
+        {!isLoading && isStreaming && <span>Online</span>}
+        {!isLoading && !isStreaming && <span>Offline</span>}
       </div>
 
       {streamUrl && (
@@ -29,6 +34,15 @@ function AudioStatus() {
           Your browser does not support the
           <code>audio</code> element.
         </audio>
+      )}
+
+      {isStreaming && (
+        <div className="AudioStatus-status">
+          <ListenerCount
+            initialListeners={initialListeners}
+            refreshMs={10000}
+          />
+        </div>
       )}
     </>
   );
