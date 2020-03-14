@@ -6,14 +6,14 @@ import "./App.css";
 function AudioStatus() {
   const [isLoading, setLoading] = useState(true);
   const [isStreaming, setStreaming] = useState(false);
-  const [streamUrl, setStreamUrl] = useState(null);
+  const [streamData, setStreamData] = useState({});
   const [initialListeners, setInitialListeners] = useState(null);
 
   useEffect(() => {
     fetchStreamMetadata().then(json => {
       if (json.icestats && json.icestats.source) {
         setStreaming(true);
-        setStreamUrl(json.icestats.source.listenurl);
+        setStreamData(json.icestats.source);
         setInitialListeners(json.icestats.source.listeners);
       }
       setLoading(false);
@@ -29,8 +29,12 @@ function AudioStatus() {
         {!isLoading && !isStreaming && <span>Offline</span>}
       </div>
 
-      {streamUrl && (
-        <audio controls src={streamUrl}>
+      {streamData.listenurl && (
+        <audio controls>
+          <source
+            src={streamData.listenurl}
+            type={streamData.server_type}
+          ></source>
           Your browser does not support the
           <code>audio</code> element.
         </audio>
