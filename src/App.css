@@ -13,8 +13,20 @@
   color: #61dafb;
 }
 
+.AudioPlayerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.AudioPlayer {
+  position: absolute;
+  top: 125px;
+}
+
 .AudioStatus-status {
-  padding: 15px;
+  padding: 0 15px;
 }
 
 @keyframes App-logo-spin {

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import AudioVisualizer from "./AudioVisualizer";
 import fetchStreamMetadata from "./utils/fetchStreamMetadata";
 import ListenerInfo from "./ListenerInfo";
 import "./App.css";
+
+const AUDIO_ID = "djstream";
 
 function AudioStatus() {
   const [isLoading, setLoading] = useState(true);
@@ -29,21 +32,16 @@ function AudioStatus() {
         {!isLoading && !isStreaming && <span>Offline</span>}
       </div>
 
-      {streamData.listenurl && (
-        <audio controls>
-          <source
-            src={streamData.listenurl}
-            type={streamData.server_type}
-          ></source>
-          Your browser does not support the
-          <code>audio</code> element.
-        </audio>
-      )}
-
       {isStreaming && (
         <div className="AudioStatus-status">
           <ListenerInfo initialListeners={initialListeners} refreshMs={10000} />
         </div>
+      )}
+
+      {streamData.listenurl && (
+        <>
+          <AudioVisualizer audioID={AUDIO_ID} streamData={streamData} />
+        </>
       )}
     </>
   );

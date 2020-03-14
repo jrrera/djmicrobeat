@@ -41,15 +41,16 @@ function ListenerInfo({ initialListeners, refreshMs = 10000 }) {
     return () => clearInterval(interval);
   }, [refreshMs, refreshListeners]);
 
+  const style = { marginTop: 0, marginBottom: 0 };
+
   return (
     <>
-      <h4 style={{ marginTop: 0 }}>{trackInfo.songStr}</h4>
       {numListeners ? (
-        <h5 style={{ marginBottom: 0 }}>Active Listeners: {numListeners}</h5>
+        <p style={style}>
+          Listeners: {numListeners} ({numPeakListeners} peak)
+        </p>
       ) : null}
-      {numListeners && numPeakListeners ? (
-        <h5 style={{ marginTop: 0 }}>Peak Listeners: {numPeakListeners}</h5>
-      ) : null}
+      <h4 style={style}>{trackInfo.songStr}</h4>
 
       {/* <ul>
         {numListeners ? <li>Active Listeners: {numListeners}</li> : null}
