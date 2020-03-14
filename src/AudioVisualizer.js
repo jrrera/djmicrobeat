@@ -92,6 +92,15 @@ function AudioVisualizer({ audioID, streamData }) {
 
     audio.onpause = () => cancelAnimationFrame(animationRef.current);
   }, [audioID]);
+
+  // Hacky workaround for Icecast returning the http version of the stream,
+  // rather than https. Chrome version 80 automatically changes url to https,
+  // which breaks due to non-standard ports 8000 and 8443.
+  const listenUrl = streamData.listenurl.replace(
+    "http://stream.djmicrobeat.com:8000",
+    "https://stream.djmicrobeat.com:8443"
+  );
+
   return (
     <div className="AudioPlayerWrapper">
       <audio
@@ -100,12 +109,8 @@ function AudioVisualizer({ audioID, streamData }) {
         id={audioID}
         controls
       >
-        <source
-          src={streamData.listenurl}
-          type={streamData.server_type}
-        ></source>
-        Your browser does not support the
-        <code>audio</code> element.
+        <source src={listenUrl} type={streamData.server_type}></source>
+        Your browser does not support the <code>audio</code> element.
       </audio>
       <canvas id="renderer"></canvas>
     </div>
