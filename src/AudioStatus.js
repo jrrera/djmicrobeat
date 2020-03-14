@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import fetchStreamMetadata from "./utils/fetchStreamMetadata";
-import ListenerCount from "./ListenerCount";
+import ListenerInfo from "./ListenerInfo";
 import "./App.css";
 
 function AudioStatus() {
@@ -42,10 +42,7 @@ function AudioStatus() {
 
       {isStreaming && (
         <div className="AudioStatus-status">
-          <ListenerCount
-            initialListeners={initialListeners}
-            refreshMs={10000}
-          />
+          <ListenerInfo initialListeners={initialListeners} refreshMs={10000} />
         </div>
       )}
     </>
