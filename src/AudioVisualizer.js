@@ -3,7 +3,8 @@ import "./App.css";
 
 // https://www.kkhaydarov.com/audio-visualizer/
 const initVisualizer = audio => {
-  const context = new AudioContext();
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioCtx();
   const src = context.createMediaElementSource(audio);
   const analyser = context.createAnalyser();
 
