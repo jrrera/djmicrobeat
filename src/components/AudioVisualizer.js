@@ -87,7 +87,8 @@ function AudioVisualizer({ audioID, streamData }) {
 
   const audioElemRef = useRef();
   const animationRef = useRef();
-  const checkPlaybackRef = useRef(0);
+  const previousStreamRef = useRef(streamData);
+
   useEffect(() => {
     const audio = document.getElementById(audioID);
     audioElemRef.current = audio;
@@ -103,32 +104,27 @@ function AudioVisualizer({ audioID, streamData }) {
     audio.onpause = () => cancelAnimationFrame(animationRef.current);
   }, [audioID]);
 
-  // TODO: Update this interval to detect fallback stream -> live stream,
-  // and manually start/stop the audio player.
   useEffect(() => {
-    const audio = document.getElementById(audioID);
-    var intervalID = setInterval(patchStreamFailure, 1000);
-    var oldTime = checkPlaybackRef.current;
+    const prevStreamData = previousStreamRef.current;
+    previousStreamRef.current = streamData;
 
-    function patchStreamFailure() {
-      console.log(
-        "checking...",
-        audio.paused,
-        audio.ended,
-        audio.currentTime,
-        oldTime
-      );
-      if (audio.paused && audio.currentTime - oldTime === 0) {
-        console.log("failure! resetting!");
-        audio.src = "";
-        audio.src = listenUrl;
-        audio.play();
-      }
-      oldTime = audio.currentTime;
+    // Missing stream_start and audio_info is a basic detection mechanism
+    // for the fallback stream. If the API tells us we *were* using fallback
+    // but no longer are, we need to force the browser to start the stream
+    // over. Icecast is great at fallbacks but terrible at resuming the main
+    // stream once it resumes again.
+    if (
+      streamData.stream_start &&
+      streamData.audio_info &&
+      !prevStreamData.stream_start &&
+      !prevStreamData.audio_info
+    ) {
+      const audio = document.getElementById(audioID);
+      audio.src = "";
+      audio.src = listenUrl;
+      audio.play();
     }
-
-    return () => clearInterval(intervalID);
-  });
+  }, [audioID, listenUrl, streamData]);
 
   return (
     <div className="AudioPlayerWrapper">
