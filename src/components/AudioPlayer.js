@@ -1,31 +1,38 @@
 import React, { useState, useEffect } from "react";
 import AudioVisualizer from "./AudioVisualizer";
-import fetchStreamMetadata from "./utils/fetchStreamMetadata";
+import fetchStreamMetadata from "../utils/fetchStreamMetadata";
 import ListenerInfo from "./ListenerInfo";
-import "./App.css";
+import "../App.css";
 
 const AUDIO_ID = "djstream";
 
-function AudioStatus() {
+function AudioPlayer() {
   const [isLoading, setLoading] = useState(true);
   const [isStreaming, setStreaming] = useState(false);
   const [streamData, setStreamData] = useState({});
-  const [initialListeners, setInitialListeners] = useState(null);
+
+  const dataCallback = json => {
+    if (json.icestats && json.icestats.source) {
+      setStreaming(true);
+      setStreamData(json.icestats.source);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    fetchStreamMetadata().then(json => {
-      if (json.icestats && json.icestats.source) {
-        setStreaming(true);
-        setStreamData(json.icestats.source);
-        setInitialListeners(json.icestats.source.listeners);
-      }
-      setLoading(false);
-    });
+    fetchStreamMetadata().then(dataCallback);
+
+    const intervalID = setInterval(
+      () => fetchStreamMetadata().then(dataCallback),
+      10000
+    );
+
+    return () => clearInterval(intervalID);
   }, []);
 
   return (
     <>
-      <div className="AudioStatus-status">
+      <div className="AudioPlayer-status">
         <span>Live Stream Status: </span>
         {isLoading && <span>..........</span>}
         {!isLoading && isStreaming && <span>Online</span>}
@@ -33,8 +40,8 @@ function AudioStatus() {
       </div>
 
       {isStreaming && (
-        <div className="AudioStatus-status">
-          <ListenerInfo initialListeners={initialListeners} refreshMs={10000} />
+        <div className="AudioPlayer-status">
+          <ListenerInfo streamData={streamData} />
         </div>
       )}
 
@@ -47,4 +54,4 @@ function AudioStatus() {
   );
 }
 
-export default AudioStatus;
+export default AudioPlayer;

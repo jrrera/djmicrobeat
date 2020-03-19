@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import "./App.css";
+import "../App.css";
 
 // https://www.kkhaydarov.com/audio-visualizer/
 const initVisualizer = audio => {
@@ -77,8 +77,17 @@ const initVisualizer = audio => {
 };
 
 function AudioVisualizer({ audioID, streamData }) {
+  // Hacky workaround for Icecast returning the http version of the stream,
+  // rather than https. Chrome version 80 automatically changes url to https,
+  // which breaks due to non-standard ports 8000 and 8443.
+  const listenUrl = streamData.listenurl.replace(
+    "http://stream.djmicrobeat.com:8000",
+    "https://stream.djmicrobeat.com:8443"
+  );
+
   const audioElemRef = useRef();
   const animationRef = useRef();
+  const checkPlaybackRef = useRef(0);
   useEffect(() => {
     const audio = document.getElementById(audioID);
     audioElemRef.current = audio;
@@ -94,13 +103,32 @@ function AudioVisualizer({ audioID, streamData }) {
     audio.onpause = () => cancelAnimationFrame(animationRef.current);
   }, [audioID]);
 
-  // Hacky workaround for Icecast returning the http version of the stream,
-  // rather than https. Chrome version 80 automatically changes url to https,
-  // which breaks due to non-standard ports 8000 and 8443.
-  const listenUrl = streamData.listenurl.replace(
-    "http://stream.djmicrobeat.com:8000",
-    "https://stream.djmicrobeat.com:8443"
-  );
+  // TODO: Update this interval to detect fallback stream -> live stream,
+  // and manually start/stop the audio player.
+  useEffect(() => {
+    const audio = document.getElementById(audioID);
+    var intervalID = setInterval(patchStreamFailure, 1000);
+    var oldTime = checkPlaybackRef.current;
+
+    function patchStreamFailure() {
+      console.log(
+        "checking...",
+        audio.paused,
+        audio.ended,
+        audio.currentTime,
+        oldTime
+      );
+      if (audio.paused && audio.currentTime - oldTime === 0) {
+        console.log("failure! resetting!");
+        audio.src = "";
+        audio.src = listenUrl;
+        audio.play();
+      }
+      oldTime = audio.currentTime;
+    }
+
+    return () => clearInterval(intervalID);
+  });
 
   return (
     <div className="AudioPlayerWrapper">
