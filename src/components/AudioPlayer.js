@@ -13,8 +13,15 @@ function AudioPlayer() {
 
   const dataCallback = json => {
     if (json.icestats && json.icestats.source) {
+      const source = json.icestats.source;
+      if (Array.isArray(source)) {
+        // TODO: Better detection of which stream source
+        // to prioritize.
+        setStreamData(source[0]);
+      } else {
+        setStreamData(source);
+      }
       setStreaming(true);
-      setStreamData(json.icestats.source);
     }
     setLoading(false);
   };
