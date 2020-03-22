@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AudioVisualizer from "./AudioVisualizer";
 import fetchStreamMetadata from "../utils/fetchStreamMetadata";
-import ListenerInfo from "./ListenerInfo";
+import StreamInfo from "./StreamInfo";
 import "../App.css";
 
 const AUDIO_ID = "djstream";
@@ -40,15 +40,13 @@ function AudioPlayer() {
   return (
     <>
       <div className="AudioPlayer-status">
-        <span>Live Stream Status: </span>
         {isLoading && <span>..........</span>}
-        {!isLoading && isStreaming && <span>Online</span>}
-        {!isLoading && !isStreaming && <span>Offline</span>}
+        {!isLoading && !isStreaming && <span>stream status: offline 😴</span>}
       </div>
 
       {isStreaming && (
         <div className="AudioPlayer-status">
-          <ListenerInfo streamData={streamData} />
+          <StreamInfo streamData={streamData} />
         </div>
       )}
 
