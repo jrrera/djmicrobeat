@@ -1,4 +1,8 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Simple audio streaming front-end for my DJ sets using Create React App, Netlify, and an Icecast server for audio streaming. 
+
+This client also polls the Icecast server for changes to the audio source to allow the client to patch up Icecast's buggy switchover behavior when two DJs are changing over during a live stream.
+
+![Screenshot of DJMicrobeat.com](https://i.imgur.com/fWxFTWE.png)
 
 ## Available Scripts
 
